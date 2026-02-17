@@ -105,7 +105,9 @@ export default function OSVizPage() {
         <div className="col-span-12 lg:col-span-3 h-full overflow-hidden">
           <JobPool
             processes={processes}
-            onAddProcess={() => addProcess(Math.floor(Math.random() * 12) + 4)}
+            onAddProcess={(burstTime) =>
+              addProcess(burstTime || Math.floor(Math.random() * 12) + 4)
+            }
           />
         </div>
 
@@ -153,9 +155,8 @@ export default function OSVizPage() {
       <div className="fixed top-0 left-1/4 w-[300px] h-[300px] bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none -z-10 animate-pulse" />
       <div className="fixed bottom-0 right-1/4 w-[300px] h-[300px] bg-cyan-600/10 rounded-full blur-[100px] pointer-events-none -z-10 animate-pulse" />
 
-      {/* Starvation Warning Portal */}
       <AnimatePresence>
-        {algorithm === "SJF" && readyQueue.length > 5 && (
+        {metrics.starvationIndex > 20 && (
           <motion.div
             initial={{ x: 300, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}

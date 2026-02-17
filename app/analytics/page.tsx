@@ -99,6 +99,18 @@ export default function AnalyticsPage() {
                 color="purple"
                 icon={<BarChart3 size={16} />}
               />
+              <SmallMetricCard
+                label="Avg Slowdown"
+                value={metrics.averageSlowdown.toFixed(2)}
+                color="indigo"
+                icon={<Activity size={16} />}
+              />
+              <SmallMetricCard
+                label="Starvation Index (Max Wait)"
+                value={metrics.starvationIndex}
+                color="blue"
+                icon={<Clock size={16} />}
+              />
             </div>
           </MetricSection>
         </div>
@@ -136,6 +148,7 @@ export default function AnalyticsPage() {
                     <th className="pb-4">End</th>
                     <th className="pb-4">Waiting</th>
                     <th className="pb-4">Turnaround</th>
+                    <th className="pb-4">Slowdown</th>
                     <th className="pb-4">Status</th>
                   </tr>
                 </thead>
@@ -175,6 +188,9 @@ export default function AnalyticsPage() {
                         </td>
                         <td className="py-4 font-mono text-xs font-bold text-amber-400">
                           {p.turnaroundTime ?? "-"}ms
+                        </td>
+                        <td className="py-4 font-mono text-xs font-bold text-indigo-400">
+                          {p.slowdown?.toFixed(2) ?? "-"}
                         </td>
                         <td className="py-4">
                           <span
@@ -268,6 +284,7 @@ function SmallMetricCard({ label, value, color, icon }: any) {
     blue: "text-blue-400",
     amber: "text-amber-400",
     purple: "text-purple-400",
+    indigo: "text-indigo-400",
   };
   return (
     <div className="glass-card p-6 flex items-center justify-between group hover:border-white/10 transition-all cursor-default">

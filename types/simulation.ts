@@ -11,6 +11,7 @@ export interface Process {
   completionTime?: number;
   turnaroundTime?: number;
   waitingTime?: number;
+  slowdown?: number;
 }
 
 export interface SchedulerMetrics {
@@ -19,6 +20,8 @@ export interface SchedulerMetrics {
   completedProcesses: number;
   averageWaitTime: number;
   averageTurnaroundTime: number;
+  averageSlowdown: number;
+  starvationIndex: number;
 }
 
 export type AlgorithmType = "FCFS" | "SJF" | "RR";

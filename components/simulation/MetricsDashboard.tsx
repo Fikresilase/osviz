@@ -153,6 +153,30 @@ export const MetricsDashboard: React.FC<MetricsDashboardProps> = ({
             {metrics.completedProcesses}
           </span>
         </div>
+        <div className="flex flex-col">
+          <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
+            Slowdown
+          </span>
+          <span className="text-sm font-black text-indigo-400 font-mono tracking-tighter">
+            {metrics.averageSlowdown.toFixed(2)}
+          </span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
+            Starvation
+          </span>
+          <span className="text-sm font-black text-orange-400 font-mono tracking-tighter">
+            {metrics.starvationIndex}
+          </span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
+            Throughput
+          </span>
+          <span className="text-sm font-black text-purple-400 font-mono tracking-tighter">
+            {(metrics.completedProcesses / (metrics.totalTime || 1)).toFixed(3)}
+          </span>
+        </div>
       </div>
     </div>
   );

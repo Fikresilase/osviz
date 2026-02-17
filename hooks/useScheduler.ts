@@ -23,6 +23,8 @@ const INITIAL_METRICS: SchedulerMetrics = {
   completedProcesses: 0,
   averageWaitTime: 0,
   averageTurnaroundTime: 0,
+  averageSlowdown: 0,
+  starvationIndex: 0,
 };
 
 const DEFAULT_QUANTUM = 2;
@@ -135,6 +137,8 @@ export const useScheduler = () => {
             runningProc.turnaroundTime = nextTime - runningProc.arrivalTime;
             runningProc.waitingTime =
               runningProc.turnaroundTime - runningProc.burstTime;
+            runningProc.slowdown =
+              runningProc.turnaroundTime / runningProc.burstTime;
 
             nextTerminatedIds.push(runningProc.id);
             nextRunningId = null;
@@ -208,11 +212,28 @@ export const useScheduler = () => {
         (acc, p) => acc + (p.turnaroundTime || 0),
         0,
       );
+      const totalSlowdown = terminatedProcs.reduce(
+        (acc, p) => acc + (p.slowdown || 0),
+        0,
+      );
 
       const count = terminatedProcs.length;
       const avgWait = count > 0 ? totalWait / count : 0;
       const avgTurnaround = count > 0 ? totalTurnaround / count : 0;
+      const avgSlowdown = count > 0 ? totalSlowdown / count : 0;
       const util = nextTime > 0 ? (nextCpuBusyTime / nextTime) * 100 : 0;
+
+      // Calculate Starvation Index: Max wait time of any non-terminated process
+      const livingProcs = nextProcesses.filter((p) => p.state !== "TERMINATED");
+      const maxWait =
+        livingProcs.length > 0
+          ? Math.max(
+              ...livingProcs.map(
+                (p) =>
+                  nextTime - p.arrivalTime - (p.burstTime - p.remainingTime),
+              ),
+            )
+          : 0;
 
       setMetrics({
         totalTime: nextTime,
@@ -220,6 +241,8 @@ export const useScheduler = () => {
         completedProcesses: count,
         averageWaitTime: avgWait,
         averageTurnaroundTime: avgTurnaround,
+        averageSlowdown: avgSlowdown,
+        starvationIndex: maxWait,
       });
 
       return {
