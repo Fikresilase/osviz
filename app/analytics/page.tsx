@@ -28,31 +28,34 @@ export default function AnalyticsPage() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 rounded-full blur-[120px]" />
       </div>
 
-      <header className="flex items-center justify-between mb-12">
-        <div className="flex items-center gap-6">
+      <header className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 md:mb-12 gap-6">
+        <div className="flex items-center gap-4 md:gap-6">
           <Link
             href="/"
-            className="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center hover:bg-slate-800 hover:scale-110 transition-all group"
+            className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center hover:bg-slate-800 hover:scale-110 transition-all group shrink-0"
           >
-            <ArrowLeft className="text-slate-400 group-hover:text-white transition-colors" />
+            <ArrowLeft
+              className="text-slate-400 group-hover:text-white transition-colors"
+              size={20}
+            />
           </Link>
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
+            <h1 className="text-xl md:text-3xl font-black tracking-tight text-white flex flex-wrap items-center gap-2 md:gap-3">
               Performance Analytics
-              <span className="text-xs bg-indigo-500/20 text-indigo-400 px-3 py-1 rounded-full border border-indigo-500/30 font-mono">
+              <span className="text-[10px] md:text-xs bg-indigo-500/20 text-indigo-400 px-2 md:px-3 py-1 rounded-full border border-indigo-500/30 font-mono">
                 {algorithm}
               </span>
             </h1>
-            <p className="text-sm text-slate-500 font-medium">
-              Deep dive into CPU scheduling efficiency and metrics.
+            <p className="text-xs md:text-sm text-slate-500 font-medium">
+              Deep dive into CPU scheduling efficiency.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="px-4 py-2 bg-slate-900/50 border border-slate-800 rounded-xl flex items-center gap-3">
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <div className="px-4 py-2 bg-slate-900/50 border border-slate-800 rounded-xl flex items-center gap-3 w-full md:w-auto justify-center md:justify-start">
             <Clock size={16} className="text-blue-400" />
-            <span className="text-xl font-mono font-bold text-white uppercase tracking-tighter">
+            <span className="text-lg md:text-xl font-mono font-bold text-white uppercase tracking-tighter">
               {metrics.totalTime}{" "}
               <span className="text-xs text-slate-500">Ticks</span>
             </span>
@@ -60,9 +63,9 @@ export default function AnalyticsPage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         {/* Metric Overview Card */}
-        <div className="lg:col-span-1 space-y-8">
+        <div className="md:col-span-2 lg:col-span-1 space-y-8">
           <MetricSection
             title="Resource Efficiency"
             icon={<Activity size={20} className="text-emerald-400" />}
@@ -70,7 +73,7 @@ export default function AnalyticsPage() {
             <LargeMetricCard
               label="CPU Utilization"
               value={`${metrics.cpuUtilization.toFixed(1)}%`}
-              description="Percentage of time CPU was busy doing useful work."
+              description="CPU time spent on tasks."
               progress={metrics.cpuUtilization}
               color="emerald"
             />
@@ -80,7 +83,7 @@ export default function AnalyticsPage() {
             title="Response Metrics"
             icon={<TrendingUp size={20} className="text-blue-400" />}
           >
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
               <SmallMetricCard
                 label="Avg Waiting Time"
                 value={`${metrics.averageWaitTime.toFixed(2)}ms`}
@@ -106,7 +109,7 @@ export default function AnalyticsPage() {
                 icon={<Activity size={16} />}
               />
               <SmallMetricCard
-                label="Starvation Index (Max Wait)"
+                label="Latency Index"
                 value={metrics.starvationIndex}
                 color="blue"
                 icon={<Clock size={16} />}
@@ -116,12 +119,12 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Detailed Timeline & Process Stats */}
-        <div className="lg:col-span-2 space-y-8">
-          <div className="glass-card p-6 h-[300px] flex flex-col">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <History size={20} className="text-indigo-400" />
-                Historical Context
+        <div className="md:col-span-2 lg:col-span-2 space-y-8">
+          <div className="glass-card p-4 md:p-6 h-[250px] md:h-[300px] flex flex-col">
+            <div className="flex items-center justify-between mb-4 md:mb-6">
+              <h3 className="text-sm md:text-lg font-bold text-white flex items-center gap-2">
+                <History size={18} className="text-indigo-400" />
+                Execution Flow
               </h3>
             </div>
             <div className="flex-1 overflow-hidden">
@@ -133,74 +136,77 @@ export default function AnalyticsPage() {
             </div>
           </div>
 
-          <div className="glass-card p-6 min-h-[400px]">
-            <h3 className="text-lg font-bold text-white mb-6">
+          <div className="glass-card p-4 md:p-6 min-h-[400px]">
+            <h3 className="text-sm md:text-lg font-bold text-white mb-6">
               Process Breakdown
             </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
+            <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0 scrollbar-hide">
+              <table className="w-full text-left min-w-[700px]">
                 <thead>
-                  <tr className="border-b border-slate-800 text-[10px] uppercase tracking-widest text-slate-500 font-black">
-                    <th className="pb-4">Process</th>
+                  <tr className="border-b border-white/5 text-[9px] md:text-[10px] uppercase tracking-widest text-slate-500 font-black">
+                    <th className="pb-4">ID</th>
                     <th className="pb-4">Arrival</th>
                     <th className="pb-4">Burst</th>
                     <th className="pb-4">Start</th>
                     <th className="pb-4">End</th>
-                    <th className="pb-4">Waiting</th>
-                    <th className="pb-4">Turnaround</th>
-                    <th className="pb-4">Slowdown</th>
+                    <th className="pb-4">Wait</th>
+                    <th className="pb-4">Turn</th>
+                    <th className="pb-4">Slow</th>
                     <th className="pb-4">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/50">
+                <tbody className="divide-y divide-white/5">
                   <AnimatePresence>
                     {processes.map((p) => (
                       <motion.tr
                         key={p.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="group hover:bg-white/5 transition-colors"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="group hover:bg-white/[0.02] transition-colors"
                       >
                         <td className="py-4">
                           <div className="flex items-center gap-3">
                             <div
-                              className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-xs"
-                              style={{ backgroundColor: p.color }}
+                              className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-xs shadow-lg"
+                              style={{
+                                backgroundColor: p.color,
+                                boxShadow: `0 4px 12px ${p.color}40`,
+                              }}
                             >
                               P{p.id}
                             </div>
                           </div>
                         </td>
-                        <td className="py-4 font-mono text-xs text-slate-400">
-                          {p.arrivalTime}ms
+                        <td className="py-4 font-mono text-[10px] md:text-xs text-slate-400">
+                          {p.arrivalTime}t
                         </td>
-                        <td className="py-4 font-mono text-xs text-slate-400">
-                          {p.burstTime}ms
+                        <td className="py-4 font-mono text-[10px] md:text-xs text-slate-400">
+                          {p.burstTime}t
                         </td>
-                        <td className="py-4 font-mono text-xs text-slate-400">
+                        <td className="py-4 font-mono text-[10px] md:text-xs text-slate-400">
                           {p.startTime ?? "-"}
                         </td>
-                        <td className="py-4 font-mono text-xs text-slate-400">
+                        <td className="py-4 font-mono text-[10px] md:text-xs text-slate-400">
                           {p.completionTime ?? "-"}
                         </td>
-                        <td className="py-4 font-mono text-xs font-bold text-blue-400">
-                          {p.waitingTime ?? "-"}ms
+                        <td className="py-4 font-mono text-[10px] md:text-xs font-bold text-blue-400">
+                          {p.waitingTime ?? "-"}
                         </td>
-                        <td className="py-4 font-mono text-xs font-bold text-amber-400">
-                          {p.turnaroundTime ?? "-"}ms
+                        <td className="py-4 font-mono text-[10px] md:text-xs font-bold text-amber-400">
+                          {p.turnaroundTime ?? "-"}
                         </td>
-                        <td className="py-4 font-mono text-xs font-bold text-indigo-400">
+                        <td className="py-4 font-mono text-[10px] md:text-xs font-bold text-indigo-400">
                           {p.slowdown?.toFixed(2) ?? "-"}
                         </td>
                         <td className="py-4">
                           <span
                             className={cn(
-                              "text-[10px] px-2 py-0.5 rounded-full font-bold uppercase",
+                              "text-[8px] md:text-[10px] px-2 py-0.5 rounded-full font-bold uppercase",
                               p.state === "TERMINATED"
-                                ? "bg-emerald-500/20 text-emerald-400"
+                                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20"
                                 : p.state === "RUNNING"
-                                  ? "bg-amber-500/20 text-amber-400 animate-pulse"
-                                  : "bg-slate-800 text-slate-500",
+                                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/20 animate-pulse"
+                                  : "bg-slate-800/40 text-slate-500 border border-white/5",
                             )}
                           >
                             {p.state}
@@ -232,7 +238,7 @@ function MetricSection({
     <div className="space-y-4">
       <div className="flex items-center gap-2 px-1">
         {icon}
-        <h2 className="text-xs uppercase font-black tracking-[0.2em] text-slate-500">
+        <h2 className="text-[10px] md:text-xs uppercase font-black tracking-[0.2em] text-slate-500">
           {title}
         </h2>
       </div>
@@ -244,26 +250,26 @@ function MetricSection({
 function LargeMetricCard({ label, value, description, progress, color }: any) {
   const colors = {
     emerald:
-      "from-emerald-600/20 to-emerald-900/10 border-emerald-500/20 text-emerald-400",
+      "from-emerald-600/20 to-emerald-950/10 border-emerald-500/20 text-emerald-400",
   };
   return (
     <div
       className={cn(
-        "glass-card p-8 bg-gradient-to-br border relative overflow-hidden",
+        "glass-card p-6 md:p-8 bg-gradient-to-br border relative overflow-hidden",
         (colors as any)[color],
       )}
     >
       <div className="relative z-10">
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+        <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">
           {label}
         </span>
-        <div className="text-6xl font-black font-mono my-2 text-white tabular-nums drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+        <div className="text-4xl md:text-6xl font-black font-mono my-2 text-white tabular-nums drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
           {value}
         </div>
-        <p className="text-sm text-slate-500 font-medium leading-relaxed max-w-[200px]">
+        <p className="text-xs md:text-sm text-slate-500 font-medium leading-relaxed max-w-[200px]">
           {description}
         </p>
-        <div className="mt-8 h-2 bg-slate-900 rounded-full overflow-hidden border border-white/5">
+        <div className="mt-6 md:mt-8 h-2 bg-slate-950 rounded-full overflow-hidden border border-white/5">
           <motion.div
             className="h-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
             initial={{ width: 0 }}
@@ -272,8 +278,8 @@ function LargeMetricCard({ label, value, description, progress, color }: any) {
           />
         </div>
       </div>
-      <div className="absolute top-0 right-0 p-8 transform translate-x-1/4 -translate-y-1/4 opacity-10">
-        <Activity size={180} />
+      <div className="absolute top-0 right-0 p-8 transform translate-x-1/4 -translate-y-1/4 opacity-5">
+        <Activity size={120} />
       </div>
     </div>
   );

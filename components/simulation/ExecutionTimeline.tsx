@@ -74,7 +74,7 @@ export const ExecutionTimeline: React.FC<ExecutionTimelineProps> = ({
                   className={cn(
                     "flex-shrink-0 h-full flex items-center justify-center relative transition-all overflow-hidden",
                     block.id === null
-                      ? "bg-slate-800/10"
+                      ? "bg-slate-700/20 border-x border-dashed border-slate-600/30"
                       : "cursor-help rounded-lg mx-0.5 shadow-lg",
                   )}
                   style={{

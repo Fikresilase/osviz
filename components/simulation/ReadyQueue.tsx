@@ -28,7 +28,17 @@ export const ReadyQueue: React.FC<ReadyQueueProps> = ({
           <UnfoldHorizontal size={20} className="text-indigo-400" />
           Ready Buffer
         </h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          {algorithm === "SJF" && (
+            <span className="text-[8px] font-bold text-indigo-400 uppercase tracking-wider animate-pulse">
+              ← Shortest First
+            </span>
+          )}
+          {algorithm === "FCFS" && (
+            <span className="text-[8px] font-bold text-emerald-400 uppercase tracking-wider">
+              ← Oldest First
+            </span>
+          )}
           <span className="text-[9px] font-black uppercase px-2 py-1 bg-indigo-500/20 text-indigo-300 rounded-lg border border-indigo-500/30 tracking-widest">
             {algorithm} Priority
           </span>

@@ -8,13 +8,13 @@ import {
 
 const PROCESS_COLORS = [
   "#3B82F6", // Blue-500
-  "#A855F7", // Purple-500
+  "#C084FC", // Purple-400 (Improved contrast)
   "#10B981", // Emerald-500
   "#F59E0B", // Amber-500
   "#EF4444", // Red-500
-  "#EC4899", // Pink-500
-  "#06B6D4", // Cyan-500
-  "#8B5CF6", // Violet-500
+  "#F472B6", // Pink-400 (Improved contrast)
+  "#22D3EE", // Cyan-400 (Improved contrast)
+  "#A78BFA", // Violet-400 (Improved contrast)
 ];
 
 const INITIAL_METRICS: SchedulerMetrics = {
@@ -28,6 +28,7 @@ const INITIAL_METRICS: SchedulerMetrics = {
 };
 
 const DEFAULT_QUANTUM = 2;
+const MAX_HISTORY_LENGTH = 500;
 
 export const useScheduler = () => {
   // Single source of truth for simulation state to ensure atomic updates
@@ -107,9 +108,6 @@ export const useScheduler = () => {
       const nextTime = prev.currentTime + 1;
 
       // 1. Move NEW -> READY if arrival time reached
-      // Actually, in the UI user just adds them, but if we supported future arrivals:
-      // For this sim, "Add Process" inputs a process at CurrentTime.
-      // But if we had a prefill, we'd check here.
       nextProcesses.forEach((p) => {
         if (p.state === "NEW" && p.arrivalTime <= nextTime) {
           p.state = "READY";
@@ -120,15 +118,12 @@ export const useScheduler = () => {
       });
 
       // 2. Process Running Job
-      let processFinished = false;
-      let processPreempted = false;
-
       if (nextRunningId !== null) {
         const runningProc = nextProcesses.find((p) => p.id === nextRunningId);
         if (runningProc) {
           runningProc.remainingTime -= 1;
           nextQuantumCounter += 1;
-          nextCpuBusyTime += 1; // CPU did work
+          nextCpuBusyTime += 1;
 
           if (runningProc.remainingTime <= 0) {
             // Finished
@@ -143,20 +138,15 @@ export const useScheduler = () => {
             nextTerminatedIds.push(runningProc.id);
             nextRunningId = null;
             nextQuantumCounter = 0;
-            processFinished = true;
           } else {
             // Check Preemption
             if (algorithm === "RR" && nextQuantumCounter >= timeQuantum) {
-              // RR Slice Expired
-              // Only preempt if there are others waiting
               if (nextReadyQueue.length > 0) {
                 runningProc.state = "READY";
                 nextReadyQueue.push(runningProc.id);
                 nextRunningId = null;
                 nextQuantumCounter = 0;
-                processPreempted = true;
               } else {
-                // Reset counter but keep running
                 nextQuantumCounter = 0;
               }
             }
@@ -164,29 +154,23 @@ export const useScheduler = () => {
         }
       }
 
-      // 3. Increment Waiting Time for those in Ready Queue
-      // This is purely for live metrics or debugging
-      // Correct Turnaround/Wait calculation is done at termination from timestamps.
-
-      // 4. Dispatcher
+      // 3. Dispatcher
       if (nextRunningId === null && nextReadyQueue.length > 0) {
         // Sort based on Algorithm
         if (algorithm === "SJF") {
-          // Non-preemptive SJF sorting (at dispatch time)
+          // Sorting by remainingTime (SRTF behavior)
           nextReadyQueue.sort((a, b) => {
             const pA = nextProcesses.find((p) => p.id === a)!;
             const pB = nextProcesses.find((p) => p.id === b)!;
-            return pA.burstTime - pB.burstTime;
+            return pA.remainingTime - pB.remainingTime;
           });
         } else if (algorithm === "FCFS") {
-          // Sort by Arrival Time
           nextReadyQueue.sort((a, b) => {
             const pA = nextProcesses.find((p) => p.id === a)!;
             const pB = nextProcesses.find((p) => p.id === b)!;
             return pA.arrivalTime - pB.arrivalTime;
           });
         }
-        // RR is FCFS within the queue logic (shift/push)
 
         const nextId = nextReadyQueue.shift();
         if (nextId) {
@@ -199,33 +183,17 @@ export const useScheduler = () => {
         }
       }
 
-      // Update Metrics
-      // Calculate strictly from terminated processes
+      // 4. Update Metrics (Real-time calculation for all active processes)
+      const activeProcs = nextProcesses.filter((p) => p.state !== "NEW");
       const terminatedProcs = nextProcesses.filter(
         (p) => p.state === "TERMINATED",
       );
-      const totalWait = terminatedProcs.reduce(
-        (acc, p) => acc + (p.waitingTime || 0),
-        0,
-      );
-      const totalTurnaround = terminatedProcs.reduce(
-        (acc, p) => acc + (p.turnaroundTime || 0),
-        0,
-      );
-      const totalSlowdown = terminatedProcs.reduce(
-        (acc, p) => acc + (p.slowdown || 0),
-        0,
-      );
 
-      const count = terminatedProcs.length;
-      const avgWait = count > 0 ? totalWait / count : 0;
-      const avgTurnaround = count > 0 ? totalTurnaround / count : 0;
-      const avgSlowdown = count > 0 ? totalSlowdown / count : 0;
-      const util = nextTime > 0 ? (nextCpuBusyTime / nextTime) * 100 : 0;
-
-      // Calculate Starvation Index: Max wait time of any non-terminated process
+      // Track waiting time for living processes for starvation index
       const livingProcs = nextProcesses.filter((p) => p.state !== "TERMINATED");
-      const maxWait =
+
+      // Correct Starvation Index: currentTime - arrivalTime - executionTime
+      const maxStarvation =
         livingProcs.length > 0
           ? Math.max(
               ...livingProcs.map(
@@ -235,15 +203,46 @@ export const useScheduler = () => {
             )
           : 0;
 
+      // Real-time averages including active processes
+      const totalWait = activeProcs.reduce((acc, p) => {
+        if (p.state === "TERMINATED") return acc + (p.waitingTime || 0);
+        // For READY/RUNNING, calculate current wait time
+        const currentWait =
+          nextTime - p.arrivalTime - (p.burstTime - p.remainingTime);
+        return acc + Math.max(0, currentWait);
+      }, 0);
+
+      const totalTurnaround = activeProcs.reduce((acc, p) => {
+        if (p.state === "TERMINATED") return acc + (p.turnaroundTime || 0);
+        return acc + (nextTime - p.arrivalTime);
+      }, 0);
+
+      const totalSlowdown = activeProcs.reduce((acc, p) => {
+        if (p.state === "TERMINATED") return acc + (p.slowdown || 0);
+        const currentTurnaround = nextTime - p.arrivalTime;
+        return acc + currentTurnaround / p.burstTime;
+      }, 0);
+
+      const count = activeProcs.length;
+      const avgWait = count > 0 ? totalWait / count : 0;
+      const avgTurnaround = count > 0 ? totalTurnaround / count : 0;
+      const avgSlowdown = count > 0 ? totalSlowdown / count : 0;
+      const util = nextTime > 0 ? (nextCpuBusyTime / nextTime) * 100 : 0;
+
       setMetrics({
         totalTime: nextTime,
         cpuUtilization: util,
-        completedProcesses: count,
+        completedProcesses: terminatedProcs.length,
         averageWaitTime: avgWait,
         averageTurnaroundTime: avgTurnaround,
         averageSlowdown: avgSlowdown,
-        starvationIndex: maxWait,
+        starvationIndex: maxStarvation,
       });
+
+      // Maintain a sliding window for history to prevent memory bloat
+      const nextHistory = [...prev.history, nextRunningId].slice(
+        -MAX_HISTORY_LENGTH,
+      );
 
       return {
         ...prev,
@@ -254,7 +253,7 @@ export const useScheduler = () => {
         currentTime: nextTime,
         quantumCounter: nextQuantumCounter,
         cpuBusyTime: nextCpuBusyTime,
-        history: [...prev.history, nextRunningId],
+        history: nextHistory,
       };
     });
   }, [algorithm, timeQuantum]);
