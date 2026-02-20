@@ -58,7 +58,7 @@ export default function OSVizPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#020617] text-slate-200 p-4 md:p-6 flex flex-col font-sans selection:bg-blue-500/30 overflow-y-auto overflow-x-hidden">
+    <main className="min-h-screen bg-[#020617] text-slate-200 p-4 md:p-6 pb-8 flex flex-col font-sans selection:bg-blue-500/30">
       {/* App Header */}
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 shrink-0">
         <div className="flex items-center gap-4">
@@ -147,7 +147,7 @@ export default function OSVizPage() {
       </div>
 
       {/* Global Controls Area - Sticky Bottom with Blur */}
-      <footer className="shrink-0 sticky bottom-0 z-50 glass p-4 rounded-2xl border-white/5 bg-slate-900/60 backdrop-blur-xl shadow-2xl">
+      <footer className="shrink-0 mt-auto sticky bottom-0 z-50 glass p-4 rounded-2xl border-white/5 bg-slate-900/60 backdrop-blur-xl shadow-2xl">
         <MetricsDashboard
           metrics={metrics}
           algorithm={algorithm}
