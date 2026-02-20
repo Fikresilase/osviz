@@ -25,10 +25,10 @@ export const JobPool: React.FC<JobPoolProps> = ({
   };
 
   return (
-    <div className="glass-card h-full p-6 flex flex-col relative overflow-hidden group border-indigo-500/10 hover:border-indigo-500/30 transition-colors">
+    <div className="glass-card p-6 flex flex-col relative overflow-hidden group border-indigo-500/10 hover:border-indigo-500/30 transition-colors max-h-[600px]">
       <div className="absolute inset-0 bg-indigo-500/5 group-hover:bg-indigo-500/10 transition-colors pointer-events-none" />
 
-      <div className="flex items-center justify-between mb-8 z-10">
+      <div className="flex items-center justify-between mb-6 z-10 shrink-0">
         <h2 className="text-xl font-black bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent flex items-center gap-2 uppercase tracking-tighter">
           <Database size={20} className="text-indigo-400" />
           Queue Entry
@@ -38,7 +38,7 @@ export const JobPool: React.FC<JobPoolProps> = ({
         </span>
       </div>
 
-      <div className="flex-1 relative border border-white/5 rounded-2xl p-6 bg-[#020617]/40 overflow-y-auto custom-scrollbar backdrop-blur-sm z-10">
+      <div className="flex-1 relative border border-white/5 rounded-2xl p-6 bg-[#020617]/40 overflow-y-auto custom-scrollbar backdrop-blur-sm z-10 min-h-0">
         <div className="flex flex-wrap gap-x-8 gap-y-12 content-start justify-center">
           <AnimatePresence mode="popLayout">
             {newProcesses.map((p) => (
@@ -73,7 +73,7 @@ export const JobPool: React.FC<JobPoolProps> = ({
         </div>
       </div>
 
-      <div className="mt-8 z-10 space-y-3">
+      <div className="mt-6 z-10 space-y-3 shrink-0">
         <div className="flex gap-2 p-1.5 bg-[#020617]/40 rounded-2xl border border-white/5 backdrop-blur-sm">
           <input
             type="number"

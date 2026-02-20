@@ -18,10 +18,10 @@ export const TerminatedSink: React.FC<TerminatedSinkProps> = ({
     .reverse(); // Show newest first
 
   return (
-    <div className="glass-card h-full p-6 flex flex-col relative overflow-hidden group border-emerald-500/10 hover:border-emerald-500/30 transition-colors">
+    <div className="glass-card p-6 flex flex-col relative overflow-hidden group border-emerald-500/10 hover:border-emerald-500/30 transition-colors max-h-[600px]">
       <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors pointer-events-none" />
 
-      <div className="flex items-center justify-between mb-8 z-10">
+      <div className="flex items-center justify-between mb-6 z-10 shrink-0">
         <h2 className="text-xl font-black bg-gradient-to-r from-emerald-400 to-green-300 bg-clip-text text-transparent flex items-center gap-2 uppercase tracking-tighter">
           <Archive size={20} className="text-emerald-400" />
           Archive
@@ -31,7 +31,7 @@ export const TerminatedSink: React.FC<TerminatedSinkProps> = ({
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4 z-10">
+      <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4 z-10 min-h-0">
         <AnimatePresence initial={false} mode="popLayout">
           {finishedProcesses.map((p) => (
             <motion.div

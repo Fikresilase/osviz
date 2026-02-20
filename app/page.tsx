@@ -58,9 +58,9 @@ export default function OSVizPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#020617] text-slate-200 p-4 md:p-6 pb-8 flex flex-col font-sans selection:bg-blue-500/30">
+    <main className="h-screen bg-[#020617] text-slate-200 flex flex-col font-sans selection:bg-blue-500/30 overflow-hidden">
       {/* App Header */}
-      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 shrink-0">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 md:p-6 pb-4 gap-4 shrink-0">
         <div className="flex items-center gap-4">
           <motion.div
             whileHover={{ rotate: 180 }}
@@ -112,42 +112,44 @@ export default function OSVizPage() {
       </header>
 
       {/* Primary Simulation View - Responsive Grid */}
-      <div className="flex-1 grid grid-cols-12 gap-6 mb-8 group/sim">
-        {/* Left Col: Job Pool */}
-        <div className="col-span-12 lg:col-span-3 min-h-[300px]">
-          <JobPool
-            processes={processes}
-            onAddProcess={(burstTime) =>
-              addProcess(burstTime || Math.floor(Math.random() * 12) + 4)
-            }
-          />
-        </div>
-
-        {/* Middle Col: Ready Queue & CPU */}
-        <div className="col-span-12 lg:col-span-6 flex flex-col gap-6">
-          <div className="h-[300px] lg:h-1/2">
-            <ReadyQueue
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 md:px-6 pb-4">
+        <div className="grid grid-cols-12 gap-6 group/sim">
+          {/* Left Col: Job Pool */}
+          <div className="col-span-12 lg:col-span-3">
+            <JobPool
               processes={processes}
-              readyQueueIds={readyQueue}
-              algorithm={algorithm}
+              onAddProcess={(burstTime) =>
+                addProcess(burstTime || Math.floor(Math.random() * 12) + 4)
+              }
             />
           </div>
-          <div className="h-[300px] lg:h-1/2">
-            <CPUCore process={runningProcess} algorithm={algorithm} />
-          </div>
-        </div>
 
-        {/* Right Col: Terminated */}
-        <div className="col-span-12 lg:col-span-3 min-h-[300px]">
-          <TerminatedSink
-            processes={processes}
-            terminatedIds={terminatedProcessIds}
-          />
+          {/* Middle Col: Ready Queue & CPU */}
+          <div className="col-span-12 lg:col-span-6 flex flex-col gap-6">
+            <div>
+              <ReadyQueue
+                processes={processes}
+                readyQueueIds={readyQueue}
+                algorithm={algorithm}
+              />
+            </div>
+            <div>
+              <CPUCore process={runningProcess} algorithm={algorithm} />
+            </div>
+          </div>
+
+          {/* Right Col: Terminated */}
+          <div className="col-span-12 lg:col-span-3">
+            <TerminatedSink
+              processes={processes}
+              terminatedIds={terminatedProcessIds}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Global Controls Area - Sticky Bottom with Blur */}
-      <footer className="shrink-0 mt-auto sticky bottom-0 z-50 glass p-4 rounded-2xl border-white/5 bg-slate-900/60 backdrop-blur-xl shadow-2xl">
+      {/* Global Controls Area - Fixed Bottom with Blur */}
+      <footer className="shrink-0 z-50 glass p-4 mx-4 md:mx-6 mb-4 rounded-2xl border-white/5 bg-slate-900/60 backdrop-blur-xl shadow-2xl">
         <MetricsDashboard
           metrics={metrics}
           algorithm={algorithm}
